@@ -1,0 +1,497 @@
+version 3
+run General-0-20251019-11:53:47-38592
+attr configname General
+attr datetime 20251019-11:53:47
+attr datetimef 20251019-115347
+attr experiment General
+attr inifile simulations/omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network securenetworkproject.simulations.SecureEnterpriseNetwork
+attr processid 38592
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network securenetworkproject.simulations.SecureEnterpriseNetwork
+config sim-time-limit 100s
+config *.router*.blockUnencrypted true
+config *.router*.ttlCheck true
+config *.router*.idsEnabled true
+config *.router*.ospfEnabled true
+config *.router*.ospfUpdateInterval 10s
+config *.router1.ipAddress "\"10.0.0.1\""
+config *.router2.ipAddress "\"10.0.0.2\""
+config *.router3.ipAddress "\"10.0.0.3\""
+config *.dhcpServer.ipAddress "\"192.168.1.10\""
+config *.dnsServer.ipAddress "\"192.168.1.11\""
+config *.httpServer.ipAddress "\"192.168.1.12\""
+config *.client1_1.startTime 0s
+config *.client1_2.startTime 5s
+config *.client1_3.startTime 10s
+config *.client2_1.startTime 15s
+config *.client2_2.startTime 20s
+config *.client1_1.macAddress "\"00:11:22:33:44:01\""
+config *.client1_2.macAddress "\"00:11:22:33:44:02\""
+config *.client1_3.macAddress "\"00:11:22:33:44:03\""
+config *.client2_1.macAddress "\"00:11:22:33:44:04\""
+config *.client2_2.macAddress "\"00:11:22:33:44:05\""
+config *.attacker.attackInterval 8s
+config cmdenv-express-mode false
+config cmdenv-event-banners true
+config **.scalar-recording true
+config **.vector-recording true
+
+par SecureEnterpriseNetwork.client1_1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.client1_1.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.client1_1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.client1_1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.client1_1.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_1.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router1.port$o[0].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[0].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router1.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router1.port$o[0].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[0].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.client1_2.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.client1_2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.client1_2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.client1_2.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_2.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router1.port$o[1].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[1].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router1.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router1.port$o[1].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[1].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_3.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.client1_3.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.client1_3.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.client1_3.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.client1_3.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_3.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router1.port$o[2].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router1.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router1.port$o[2].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[2].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.client2_1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.client2_1.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.client2_1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.client2_1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.client2_1.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.client2_1.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router2.port$o[0].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[0].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router2.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router2.port$o[0].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[0].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.client2_2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.client2_2.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.client2_2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.client2_2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.client2_2.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.client2_2.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router2.port$o[1].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[1].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router2.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router2.port$o[1].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[1].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.attacker.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.attacker.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.attacker.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.attacker.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.attacker.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.attacker.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router2.port$o[2].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router2.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router2.port$o[2].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[2].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router1.port$o[3].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[3].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router1.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router1.port$o[3].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[3].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[0].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[0].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[0].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[0].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router2.port$o[3].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[3].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router2.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router2.port$o[3].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[3].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[1].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[1].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[1].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[1].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router1.port$o[4].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[4].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router1.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router1.port$o[4].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router1.port$o[4].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router2.port$o[4].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[4].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router2.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router2.port$o[4].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router2.port$o[4].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[2].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[2].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[2].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.dhcpServer.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[3].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[3].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[3].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[3].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer1.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[4].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[4].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[4].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[4].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer2.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[5].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[5].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[5].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[5].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[5].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[5].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.dnsServer3.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[6].channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.router3.port$o[6].channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[6].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.router3.port$o[6].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.router3.port$o[6].channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.router3.port$o[6].channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.httpServer.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureEnterpriseNetwork.httpServer.port$o.channel disabled false
+attr mutable ""
+par SecureEnterpriseNetwork.httpServer.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureEnterpriseNetwork.httpServer.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureEnterpriseNetwork.httpServer.port$o.channel ber 0
+attr mutable ""
+par SecureEnterpriseNetwork.httpServer.port$o.channel per 0
+attr mutable ""
+par SecureEnterpriseNetwork.client1_1 typename "\"securenetworkproject.simulations.SecureClient\""
+par SecureEnterpriseNetwork.client1_1 ipAddress "\"\""
+par SecureEnterpriseNetwork.client1_1 macAddress "\"00:11:22:33:44:01\""
+par SecureEnterpriseNetwork.client1_1 startTime 0s
+attr unit s
+par SecureEnterpriseNetwork.client1_2 typename "\"securenetworkproject.simulations.SecureClient\""
+par SecureEnterpriseNetwork.client1_2 ipAddress "\"\""
+par SecureEnterpriseNetwork.client1_2 macAddress "\"00:11:22:33:44:02\""
+par SecureEnterpriseNetwork.client1_2 startTime 5s
+attr unit s
+par SecureEnterpriseNetwork.client1_3 typename "\"securenetworkproject.simulations.SecureClient\""
+par SecureEnterpriseNetwork.client1_3 ipAddress "\"\""
+par SecureEnterpriseNetwork.client1_3 macAddress "\"00:11:22:33:44:03\""
+par SecureEnterpriseNetwork.client1_3 startTime 10s
+attr unit s
+par SecureEnterpriseNetwork.client2_1 typename "\"securenetworkproject.simulations.SecureClient\""
+par SecureEnterpriseNetwork.client2_1 ipAddress "\"\""
+par SecureEnterpriseNetwork.client2_1 macAddress "\"00:11:22:33:44:04\""
+par SecureEnterpriseNetwork.client2_1 startTime 15s
+attr unit s
+par SecureEnterpriseNetwork.client2_2 typename "\"securenetworkproject.simulations.SecureClient\""
+par SecureEnterpriseNetwork.client2_2 ipAddress "\"\""
+par SecureEnterpriseNetwork.client2_2 macAddress "\"00:11:22:33:44:05\""
+par SecureEnterpriseNetwork.client2_2 startTime 20s
+attr unit s
+par SecureEnterpriseNetwork.attacker typename "\"securenetworkproject.simulations.AttackerNode\""
+par SecureEnterpriseNetwork.attacker attackInterval 8s
+attr unit s
+scalar SecureEnterpriseNetwork.attacker AttacksAttempted 7
+par SecureEnterpriseNetwork.router1 typename "\"securenetworkproject.simulations.SecureRouter\""
+par SecureEnterpriseNetwork.router1 blockUnencrypted true
+par SecureEnterpriseNetwork.router1 ttlCheck true
+par SecureEnterpriseNetwork.router1 idsEnabled true
+par SecureEnterpriseNetwork.router1 ospfEnabled true
+par SecureEnterpriseNetwork.router1 routerId 1
+par SecureEnterpriseNetwork.router1 ipAddress "\"10.0.0.1\""
+par SecureEnterpriseNetwork.router1 ospfUpdateInterval 10s
+attr unit s
+scalar SecureEnterpriseNetwork.router1 Router1_Forwarded 30
+par SecureEnterpriseNetwork.router2 typename "\"securenetworkproject.simulations.SecureRouter\""
+par SecureEnterpriseNetwork.router2 blockUnencrypted true
+par SecureEnterpriseNetwork.router2 ttlCheck true
+par SecureEnterpriseNetwork.router2 idsEnabled true
+par SecureEnterpriseNetwork.router2 ospfEnabled true
+par SecureEnterpriseNetwork.router2 routerId 2
+par SecureEnterpriseNetwork.router2 ipAddress "\"10.0.0.2\""
+par SecureEnterpriseNetwork.router2 ospfUpdateInterval 10s
+attr unit s
+scalar SecureEnterpriseNetwork.router2 Router2_Forwarded 22
+par SecureEnterpriseNetwork.router3 typename "\"securenetworkproject.simulations.SecureRouter\""
+par SecureEnterpriseNetwork.router3 blockUnencrypted true
+par SecureEnterpriseNetwork.router3 ttlCheck true
+par SecureEnterpriseNetwork.router3 idsEnabled true
+par SecureEnterpriseNetwork.router3 ospfEnabled true
+par SecureEnterpriseNetwork.router3 routerId 3
+par SecureEnterpriseNetwork.router3 ipAddress "\"10.0.0.3\""
+par SecureEnterpriseNetwork.router3 ospfUpdateInterval 10s
+attr unit s
+scalar SecureEnterpriseNetwork.router3 Router3_Forwarded 52
+par SecureEnterpriseNetwork.dhcpServer typename "\"securenetworkproject.simulations.SecureDHCPServer\""
+par SecureEnterpriseNetwork.dhcpServer ipAddress "\"192.168.1.10\""
+scalar SecureEnterpriseNetwork.dhcpServer RequestsReceived 5
+scalar SecureEnterpriseNetwork.dhcpServer LeasesGranted 5
+scalar SecureEnterpriseNetwork.dhcpServer AuthFailures 0
+par SecureEnterpriseNetwork.dnsServer1 typename "\"securenetworkproject.simulations.SecureDNSServer\""
+par SecureEnterpriseNetwork.dnsServer1 ipAddress "\"192.168.1.11\""
+scalar SecureEnterpriseNetwork.dnsServer1 QueriesReceived 5
+scalar SecureEnterpriseNetwork.dnsServer1 QueriesBlocked 0
+scalar SecureEnterpriseNetwork.dnsServer1 SpoofingAttempts 0
+par SecureEnterpriseNetwork.dnsServer2 typename "\"securenetworkproject.simulations.SecureDNSServer\""
+par SecureEnterpriseNetwork.dnsServer2 ipAddress "\"192.168.1.12\""
+scalar SecureEnterpriseNetwork.dnsServer2 QueriesReceived 5
+scalar SecureEnterpriseNetwork.dnsServer2 QueriesBlocked 0
+scalar SecureEnterpriseNetwork.dnsServer2 SpoofingAttempts 0
+par SecureEnterpriseNetwork.dnsServer3 typename "\"securenetworkproject.simulations.SecureDNSServer\""
+par SecureEnterpriseNetwork.dnsServer3 ipAddress "\"192.168.1.13\""
+scalar SecureEnterpriseNetwork.dnsServer3 QueriesReceived 5
+scalar SecureEnterpriseNetwork.dnsServer3 QueriesBlocked 0
+scalar SecureEnterpriseNetwork.dnsServer3 SpoofingAttempts 0
+par SecureEnterpriseNetwork.httpServer typename "\"securenetworkproject.simulations.SecureHTTPServer\""
+par SecureEnterpriseNetwork.httpServer ipAddress "\"192.168.1.14\""
+scalar SecureEnterpriseNetwork.httpServer HTTPS_Accepted 5
+scalar SecureEnterpriseNetwork.httpServer HTTPS_Rejected 2
+scalar SecureEnterpriseNetwork.httpServer HTTPS_UnencryptedBlocked 0
+par SecureEnterpriseNetwork typename "\"securenetworkproject.simulations.SecureEnterpriseNetwork\""
+

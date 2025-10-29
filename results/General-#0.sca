@@ -1,0 +1,486 @@
+version 3
+run General-0-20251029-22:00:07-47408
+attr configname General
+attr datetime 20251029-22:00:07
+attr datetimef 20251029-220007
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network simulations.SecureNetworkProject
+attr processid 47408
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network simulations.SecureNetworkProject
+config sim-time-limit 100s
+config *.router*.blockUnencrypted true
+config *.router*.ttlCheck true
+config *.router*.idsEnabled true
+config *.router*.ospfEnabled true
+config *.router*.ospfUpdateInterval 10s
+config *.router1.ipAddress "\"10.0.0.1\""
+config *.router2.ipAddress "\"10.0.0.2\""
+config *.router3.ipAddress "\"10.0.0.3\""
+config *.dhcpServer.ipAddress "\"192.168.1.10\""
+config *.dnsServer.ipAddress "\"192.168.1.11\""
+config *.httpServer1.ipAddress "\"192.168.1.100\""
+config *.httpServer1.serverName "\"cisco.com\""
+config *.httpServer2.ipAddress "\"192.168.1.101\""
+config *.httpServer2.serverName "\"omnet.com\""
+config *.client1_1.startTime 0s
+config *.client1_1.macAddress "\"00:11:22:33:44:01\""
+config *.client1_1.clientMode "\"FULL_WORKFLOW\""
+config *.client1_1.targetDomain "\"cisco.com\""
+config *.client2_1.startTime 3s
+config *.client2_1.macAddress "\"00:11:22:33:44:04\""
+config *.client2_1.clientMode "\"FULL_WORKFLOW\""
+config *.client2_1.targetDomain "\"omnet.com\""
+config *.client1_2.startTime 5s
+config *.client1_2.macAddress "\"00:11:22:33:44:02\""
+config *.client1_2.clientMode "\"DHCP_ONLY\""
+config *.client1_3.startTime 10s
+config *.client1_3.macAddress "\"00:11:22:33:44:03\""
+config *.client1_3.clientMode "\"DHCP_ONLY\""
+config *.client2_2.startTime 15s
+config *.client2_2.macAddress "\"00:11:22:33:44:05\""
+config *.client2_2.clientMode "\"DHCP_ONLY\""
+config *.attacker.attackInterval 8s
+config cmdenv-express-mode false
+config cmdenv-event-banners true
+config **.scalar-recording true
+config **.vector-recording true
+
+par SecureNetworkProject.client1_1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.client1_1.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.client1_1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.client1_1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.client1_1.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.client1_1.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router1.port$o[0].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router1.port$o[0].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router1.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router1.port$o[0].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[0].channel per 0
+attr mutable ""
+par SecureNetworkProject.client1_2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.client1_2.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.client1_2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.client1_2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.client1_2.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.client1_2.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router1.port$o[1].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router1.port$o[1].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router1.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router1.port$o[1].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[1].channel per 0
+attr mutable ""
+par SecureNetworkProject.client1_3.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.client1_3.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.client1_3.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.client1_3.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.client1_3.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.client1_3.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router1.port$o[2].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router1.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router1.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router1.port$o[2].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[2].channel per 0
+attr mutable ""
+par SecureNetworkProject.client2_1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.client2_1.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.client2_1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.client2_1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.client2_1.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.client2_1.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router2.port$o[0].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router2.port$o[0].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router2.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router2.port$o[0].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[0].channel per 0
+attr mutable ""
+par SecureNetworkProject.client2_2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.client2_2.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.client2_2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.client2_2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.client2_2.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.client2_2.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router2.port$o[1].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router2.port$o[1].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router2.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router2.port$o[1].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[1].channel per 0
+attr mutable ""
+par SecureNetworkProject.attacker.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.attacker.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.attacker.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.attacker.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.attacker.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.attacker.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router2.port$o[2].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router2.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router2.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router2.port$o[2].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[2].channel per 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router1.port$o[3].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router1.port$o[3].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router1.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router1.port$o[3].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[3].channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[0].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[0].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[0].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[0].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[0].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[0].channel per 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router2.port$o[3].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router2.port$o[3].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router2.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router2.port$o[3].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[3].channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[1].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[1].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[1].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[1].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[1].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[1].channel per 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router1.port$o[4].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router1.port$o[4].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router1.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router1.port$o[4].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router1.port$o[4].channel per 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router2.port$o[4].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router2.port$o[4].channel delay 0.002s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router2.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router2.port$o[4].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router2.port$o[4].channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[2].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[2].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[2].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[2].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[2].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[2].channel per 0
+attr mutable ""
+par SecureNetworkProject.dhcpServer.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.dhcpServer.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.dhcpServer.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.dhcpServer.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.dhcpServer.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.dhcpServer.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[3].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[3].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[3].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[3].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[3].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[3].channel per 0
+attr mutable ""
+par SecureNetworkProject.dnsServer.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.dnsServer.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.dnsServer.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.dnsServer.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.dnsServer.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.dnsServer.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[4].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[4].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[4].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[4].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[4].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[4].channel per 0
+attr mutable ""
+par SecureNetworkProject.httpServer1.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.httpServer1.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.httpServer1.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.httpServer1.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.httpServer1.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.httpServer1.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[5].channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.router3.port$o[5].channel disabled false
+attr mutable ""
+par SecureNetworkProject.router3.port$o[5].channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.router3.port$o[5].channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.router3.port$o[5].channel ber 0
+attr mutable ""
+par SecureNetworkProject.router3.port$o[5].channel per 0
+attr mutable ""
+par SecureNetworkProject.httpServer2.port$o.channel typename "\"ned.DatarateChannel\""
+par SecureNetworkProject.httpServer2.port$o.channel disabled false
+attr mutable ""
+par SecureNetworkProject.httpServer2.port$o.channel delay 0.001s
+attr mutable ""
+attr unit s
+par SecureNetworkProject.httpServer2.port$o.channel datarate 1e+08bps
+attr mutable ""
+attr unit bps
+par SecureNetworkProject.httpServer2.port$o.channel ber 0
+attr mutable ""
+par SecureNetworkProject.httpServer2.port$o.channel per 0
+attr mutable ""
+par SecureNetworkProject.client1_1 typename "\"simulations.SecureClient\""
+par SecureNetworkProject.client1_1 ipAddress "\"\""
+par SecureNetworkProject.client1_1 macAddress "\"00:11:22:33:44:01\""
+par SecureNetworkProject.client1_1 startTime 0s
+attr unit s
+par SecureNetworkProject.client1_1 clientMode "\"FULL_WORKFLOW\""
+par SecureNetworkProject.client1_1 targetDomain "\"cisco.com\""
+par SecureNetworkProject.client1_2 typename "\"simulations.SecureClient\""
+par SecureNetworkProject.client1_2 ipAddress "\"\""
+par SecureNetworkProject.client1_2 macAddress "\"00:11:22:33:44:02\""
+par SecureNetworkProject.client1_2 startTime 5s
+attr unit s
+par SecureNetworkProject.client1_2 clientMode "\"DHCP_ONLY\""
+par SecureNetworkProject.client1_2 targetDomain "\"\""
+par SecureNetworkProject.client1_3 typename "\"simulations.SecureClient\""
+par SecureNetworkProject.client1_3 ipAddress "\"\""
+par SecureNetworkProject.client1_3 macAddress "\"00:11:22:33:44:03\""
+par SecureNetworkProject.client1_3 startTime 10s
+attr unit s
+par SecureNetworkProject.client1_3 clientMode "\"DHCP_ONLY\""
+par SecureNetworkProject.client1_3 targetDomain "\"\""
+par SecureNetworkProject.client2_1 typename "\"simulations.SecureClient\""
+par SecureNetworkProject.client2_1 ipAddress "\"\""
+par SecureNetworkProject.client2_1 macAddress "\"00:11:22:33:44:04\""
+par SecureNetworkProject.client2_1 startTime 3s
+attr unit s
+par SecureNetworkProject.client2_1 clientMode "\"FULL_WORKFLOW\""
+par SecureNetworkProject.client2_1 targetDomain "\"omnet.com\""
+par SecureNetworkProject.client2_2 typename "\"simulations.SecureClient\""
+par SecureNetworkProject.client2_2 ipAddress "\"\""
+par SecureNetworkProject.client2_2 macAddress "\"00:11:22:33:44:05\""
+par SecureNetworkProject.client2_2 startTime 15s
+attr unit s
+par SecureNetworkProject.client2_2 clientMode "\"DHCP_ONLY\""
+par SecureNetworkProject.client2_2 targetDomain "\"\""
+par SecureNetworkProject.attacker typename "\"simulations.AttackerNode\""
+par SecureNetworkProject.attacker attackInterval 8s
+attr unit s
+scalar SecureNetworkProject.attacker AttacksAttempted 1
+par SecureNetworkProject.router1 typename "\"simulations.SecureRouter\""
+par SecureNetworkProject.router1 blockUnencrypted true
+par SecureNetworkProject.router1 ttlCheck true
+par SecureNetworkProject.router1 idsEnabled true
+par SecureNetworkProject.router1 ospfEnabled true
+par SecureNetworkProject.router1 routerId 1
+par SecureNetworkProject.router1 ipAddress "\"10.0.0.1\""
+par SecureNetworkProject.router1 ospfUpdateInterval 10s
+attr unit s
+scalar SecureNetworkProject.router1 Router1_Forwarded 15
+par SecureNetworkProject.router2 typename "\"simulations.SecureRouter\""
+par SecureNetworkProject.router2 blockUnencrypted true
+par SecureNetworkProject.router2 ttlCheck true
+par SecureNetworkProject.router2 idsEnabled true
+par SecureNetworkProject.router2 ospfEnabled true
+par SecureNetworkProject.router2 routerId 2
+par SecureNetworkProject.router2 ipAddress "\"10.0.0.2\""
+par SecureNetworkProject.router2 ospfUpdateInterval 10s
+attr unit s
+scalar SecureNetworkProject.router2 Router2_Forwarded 10
+par SecureNetworkProject.router3 typename "\"simulations.SecureRouter\""
+par SecureNetworkProject.router3 blockUnencrypted true
+par SecureNetworkProject.router3 ttlCheck true
+par SecureNetworkProject.router3 idsEnabled true
+par SecureNetworkProject.router3 ospfEnabled true
+par SecureNetworkProject.router3 routerId 3
+par SecureNetworkProject.router3 ipAddress "\"10.0.0.3\""
+par SecureNetworkProject.router3 ospfUpdateInterval 10s
+attr unit s
+scalar SecureNetworkProject.router3 Router3_Forwarded 20
+par SecureNetworkProject.dhcpServer typename "\"simulations.SecureDHCPServer\""
+par SecureNetworkProject.dhcpServer ipAddress "\"192.168.1.10\""
+scalar SecureNetworkProject.dhcpServer RequestsReceived 9
+scalar SecureNetworkProject.dhcpServer LeasesGranted 0
+scalar SecureNetworkProject.dhcpServer AuthFailures 0
+par SecureNetworkProject.dnsServer typename "\"simulations.SecureDNSServer\""
+par SecureNetworkProject.dnsServer ipAddress "\"192.168.1.11\""
+scalar SecureNetworkProject.dnsServer QueriesReceived 1
+scalar SecureNetworkProject.dnsServer QueriesBlocked 0
+scalar SecureNetworkProject.dnsServer SpoofingAttempts 0
+par SecureNetworkProject.httpServer1 typename "\"simulations.SecureHTTPServer\""
+par SecureNetworkProject.httpServer1 ipAddress "\"192.168.1.100\""
+par SecureNetworkProject.httpServer1 serverName "\"cisco.com\""
+scalar SecureNetworkProject.httpServer1 HTTPS_Accepted_cisco.com 0
+scalar SecureNetworkProject.httpServer1 HTTPS_Rejected_cisco.com 0
+par SecureNetworkProject.httpServer2 typename "\"simulations.SecureHTTPServer\""
+par SecureNetworkProject.httpServer2 ipAddress "\"192.168.1.101\""
+par SecureNetworkProject.httpServer2 serverName "\"omnet.com\""
+scalar SecureNetworkProject.httpServer2 HTTPS_Accepted_omnet.com 0
+scalar SecureNetworkProject.httpServer2 HTTPS_Rejected_omnet.com 1
+par SecureNetworkProject typename "\"simulations.SecureNetworkProject\""
+

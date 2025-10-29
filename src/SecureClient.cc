@@ -1,0 +1,401 @@
+#include <omnetpp.h>
+#include <cstring>
+#include <string>
+
+using namespace omnetpp;
+
+// ================================================================
+// Helper function declarations
+// ================================================================
+cPacket *encryptDhcpRequest(int clientId, const char *mac);
+cPacket *createEncryptedDnsQuery(int clientId, int queryId, const char *domain);
+cPacket *createEncryptedHttpsRequest(int clientId, int requestId, const char *targetIP, const char *domain);
+
+// ================================================================
+// SecureClient module
+// ================================================================
+class SecureClient : public cSimpleModule {
+  private:
+    enum WorkflowStage {
+        WAITING,
+        DHCP_STAGE,
+        DNS_STAGE,
+        HTTPS_STAGE,
+        COMPLETED_STAGE
+    };
+
+    enum ClientMode {
+        DHCP_ONLY,
+        FULL_WORKFLOW
+    };
+
+    cMessage *dhcpTimer = nullptr;
+    cMessage *dnsTimer = nullptr;
+    cMessage *httpTimer = nullptr;
+    cMessage *startupTimer = nullptr;
+
+    int dhcpRequests = 0;
+    int dnsQueries = 0;
+    int httpRequests = 0;
+    std::string assignedIP = "DHCP...";
+    bool hasIP = false;
+    double startTime = 0;
+    std::string macAddress;
+    std::string targetDomain;
+    std::string resolvedIP;
+    ClientMode mode;
+
+    WorkflowStage stage = WAITING;
+
+    void transitionToStage(WorkflowStage newStage);
+    void scheduleDnsQuery(simtime_t delay);
+    void scheduleHttpRequest(simtime_t delay);
+
+  protected:
+    virtual void initialize() override {
+        const double workflowLead = 0.5;
+        startTime = par("startTime").doubleValue() + workflowLead;
+        macAddress = par("macAddress").stringValue();
+        targetDomain = par("targetDomain").stringValue();
+        
+        // Determine client mode
+        std::string modeStr = par("clientMode").stringValue();
+        if (modeStr == "FULL_WORKFLOW") {
+            mode = FULL_WORKFLOW;
+        } else {
+            mode = DHCP_ONLY;
+        }
+
+        startupTimer = new cMessage("startup");
+        scheduleAt(simTime() + startTime, startupTimer);
+
+        updateDisplay();
+
+        if (mode == FULL_WORKFLOW) {
+            EV << "✅ CLIENT[" << getId() << "]: FULL_WORKFLOW mode - Target: " << targetDomain << "\n";
+        } else {
+            EV << "✅ CLIENT[" << getId() << "]: DHCP_ONLY mode\n";
+        }
+        
+        if (startTime > 0)
+            EV << "   Will start at t=" << startTime << "s\n";
+    }
+
+    virtual void handleMessage(cMessage *msg) override {
+       
+       
+       // --- Peer data trigger for client1_1 → client2_1 ---
+if (strcmp(msg->getName(), "peerData") == 0) {
+    EV << "CLIENT[" << getId() << "]: 💬 Sending encrypted data to Client2_1\n";
+    cPacket *p = new cPacket("CLIENT-DATA");
+    p->addPar("encrypted") = true;
+    p->addPar("protocol") = "DATA";
+    p->addPar("ttl") = 64;
+    p->addPar("clientId") = getId();
+    send(p, "port$o");
+    delete msg;
+    return;
+}
+
+       
+       
+        if (msg == startupTimer) {
+            EV << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            EV << "CLIENT[" << getId() << "]: JOINING NETWORK\n";
+            if (mode == FULL_WORKFLOW) {
+                EV << "   Mode: FULL_WORKFLOW (DNS + HTTP)\n";
+                EV << "   Target: " << targetDomain << "\n";
+            } else {
+                EV << "   Mode: DHCP_ONLY\n";
+            }
+            EV << "   Requesting IP from DHCP...\n";
+            EV << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+            if (!dhcpTimer) dhcpTimer = new cMessage("dhcpTimer");
+            if (!dnsTimer)   dnsTimer  = new cMessage("dnsTimer");
+            if (!httpTimer)  httpTimer = new cMessage("httpTimer");
+
+            transitionToStage(DHCP_STAGE);
+            scheduleAt(simTime() + uniform(0.1, 0.5), dhcpTimer);
+            return;
+        }
+
+if (msg == dhcpTimer) {
+    if (stage != DHCP_STAGE) return;
+
+    if (dhcpRequests == 0) {
+        EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-DISCOVER\n";
+        cPacket *disc = new cPacket("DHCP-DISCOVER");
+        disc->addPar("encrypted") = true;
+        disc->addPar("protocol") = "DHCP";
+        disc->addPar("macAddress") = macAddress.c_str();
+        send(disc, "port$o");
+    } else {
+        EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-REQUEST\n";
+        cPacket *req = new cPacket("DHCP-REQUEST");
+        req->addPar("encrypted") = true;
+        req->addPar("protocol") = "DHCP";
+        req->addPar("macAddress") = macAddress.c_str();
+        send(req, "port$o");
+    }
+
+    dhcpRequests++;
+    scheduleAt(simTime() + 3.0, dhcpTimer);
+    return;
+}
+
+
+
+        if (msg == dnsTimer) {
+            if (stage != DNS_STAGE || mode != FULL_WORKFLOW) return;
+
+            dnsQueries++;
+            EV_INFO << "CLIENT[" << getId() << "]: 🔍 Resolving domain: " << targetDomain << "\n";
+            send(createEncryptedDnsQuery(getId(), dnsQueries, targetDomain.c_str()), "port$o");
+            updateDisplay();
+            return;
+        }
+
+        if (msg == httpTimer) {
+            if (stage != HTTPS_STAGE || mode != FULL_WORKFLOW) return;
+            if (!hasIP || resolvedIP.empty()) {
+                scheduleHttpRequest(1.0);
+                return;
+            }
+
+            httpRequests++;
+            EV_INFO << "CLIENT[" << getId() << "]: 🌐 Accessing " << targetDomain 
+                    << " at " << resolvedIP << "\n";
+            send(createEncryptedHttpsRequest(getId(), httpRequests, resolvedIP.c_str(), targetDomain.c_str()), "port$o");
+            updateDisplay();
+            return;
+        }
+
+        // Handle received packets
+        cPacket *pkt = check_and_cast<cPacket*>(msg);
+        std::string msgName = pkt->getName();
+        std::string protocol = pkt->hasPar("protocol") ? pkt->par("protocol").stringValue() : "UNKNOWN";
+
+        // Ignore OSPF updates
+        if (msgName.find("OSPF") != std::string::npos || protocol == "OSPF") {
+            EV_DEBUG << "CLIENT[" << getId() << "]: Ignoring OSPF routing message\n";
+            delete pkt;
+            return;
+        }
+if (msgName == "DHCP-OFFER") {
+    EV << "CLIENT[" << getId() << "]: Received DHCP-OFFER, sending DHCP-REQUEST\n";
+    cPacket *req = new cPacket("DHCP-REQUEST");
+    req->addPar("encrypted") = true;
+    req->addPar("protocol") = "DHCP";
+    req->addPar("macAddress") = macAddress.c_str();
+    send(req, "port$o");
+    delete pkt;
+    return;
+}
+
+        // DHCP Response handling
+        if (msgName == "DHCP-ACK" && protocol == "DHCP" && !hasIP) {
+            if (pkt->hasPar("assignedIP")) {
+                assignedIP = pkt->par("assignedIP").stringValue();
+                hasIP = true;
+
+// === Trigger peer data from client1_1 to client2_1 ===
+if (getFullPath().find("client1_1") != std::string::npos) {
+    cMessage *peerTimer = new cMessage("peerData");
+    scheduleAt(simTime() + 0.5, peerTimer);
+}
+
+
+                EV << "\n╔══════════════════════════════════════╗\n";
+                EV << "║ CLIENT[" << getId() << "]: IP ASSIGNED: " << assignedIP << " ║\n";
+                EV << "╚══════════════════════════════════════╝\n\n";
+                
+                if (dhcpTimer && dhcpTimer->isScheduled())
+                    cancelEvent(dhcpTimer);
+                
+// === NEW SECTION: test data from client1_1 → client2_1 ===
+if (getId() == 2) {  // Only client1_1 (check its module ID in simulation)
+    EV << "CLIENT[" << getId() << "]: 💬 Sending peer data to client2_1\n";
+    cPacket *peerPkt = new cPacket("CLIENT-DATA");
+    peerPkt->addPar("encrypted") = true;
+    peerPkt->addPar("protocol") = "DATA";
+    peerPkt->addPar("ttl") = 64;
+    peerPkt->addPar("clientId") = getId();
+    send(peerPkt, "port$o");
+}
+
+
+                if (mode == FULL_WORKFLOW) {
+                    transitionToStage(DNS_STAGE);
+                    scheduleDnsQuery(0.5);
+                } else {
+                    transitionToStage(COMPLETED_STAGE);
+                    EV << "CLIENT[" << getId() << "]: ✅ DHCP_ONLY mode complete\n";
+                }
+            }
+        }
+        // DNS Response handling
+        else if (msgName == "DNS-RESPONSE" && protocol == "DNS") {
+            if (stage == DNS_STAGE && pkt->hasPar("resolvedIP")) {
+                resolvedIP = pkt->par("resolvedIP").stringValue();
+                std::string domain = pkt->hasPar("domain") ? pkt->par("domain").stringValue() : targetDomain;
+                
+                EV << "\n╔══════════════════════════════════════╗\n";
+                EV << "║ CLIENT[" << getId() << "]: DNS RESOLVED        ║\n";
+                EV << "║ " << domain << " → " << resolvedIP << "    ║\n";
+                EV << "╚══════════════════════════════════════╝\n\n";
+                
+                transitionToStage(HTTPS_STAGE);
+                scheduleHttpRequest(0.5);
+            }
+        }
+        // HTTPS Response handling
+        else if (msgName == "HTTPS-RESPONSE" && protocol == "HTTPS") {
+            if (stage == HTTPS_STAGE) {
+                std::string serverName = pkt->hasPar("serverName") ? pkt->par("serverName").stringValue() : targetDomain;
+                int statusCode = pkt->hasPar("statusCode") ? (int)pkt->par("statusCode").longValue() : 200;
+                
+                EV << "\n╔══════════════════════════════════════╗\n";
+                EV << "║ CLIENT[" << getId() << "]: HTTPS SUCCESS      ║\n";
+                EV << "║ Server: " << serverName << "             ║\n";
+                EV << "║ Status: " << statusCode << " OK                  ║\n";
+                EV << "╚══════════════════════════════════════╝\n\n";
+                
+                transitionToStage(COMPLETED_STAGE);
+            }
+        }
+        else {
+            EV_DEBUG << "CLIENT[" << getId() << "]: Ignoring message '" 
+                     << msgName << "' with protocol '" << protocol << "'\n";
+        }
+
+        updateDisplay();
+        delete pkt;
+    }
+
+    void updateDisplay() {
+        const char *color = "grey";
+        std::string stageLabel;
+
+        switch (stage) {
+            case WAITING: {
+                bool scheduledStart = startTime > simTime().dbl();
+                stageLabel = scheduledStart ? "Waiting" : "Waiting";
+                color = "grey";
+                break;
+            }
+            case DHCP_STAGE:
+                stageLabel = "DHCP";
+                color = "yellow";
+                break;
+            case DNS_STAGE:
+                stageLabel = "DNS (" + targetDomain + ")";
+                color = "cyan";
+                break;
+            case HTTPS_STAGE:
+                stageLabel = "HTTPS (" + targetDomain + ")";
+                color = "orange";
+                break;
+            case COMPLETED_STAGE:
+                if (mode == FULL_WORKFLOW) {
+                    stageLabel = "✓ Complete";
+                    color = "green";
+                } else {
+                    stageLabel = "✓ DHCP Only";
+                    color = "green";
+                }
+                break;
+        }
+
+        char buf[200];
+        if (hasIP && mode == FULL_WORKFLOW) {
+            sprintf(buf, "Client %d\n%s\nIP: %s\n→ %s", getId(), stageLabel.c_str(), 
+                    assignedIP.c_str(), targetDomain.c_str());
+        } else if (hasIP) {
+            sprintf(buf, "Client %d\n%s\nIP: %s", getId(), stageLabel.c_str(), assignedIP.c_str());
+        } else {
+            sprintf(buf, "Client %d\n%s", getId(), stageLabel.c_str());
+        }
+
+        getDisplayString().setTagArg("t", 0, buf);
+        getDisplayString().setTagArg("i", 1, color);
+    }
+
+    virtual void finish() override {
+        if (startupTimer) cancelAndDelete(startupTimer);
+        if (dhcpTimer) cancelAndDelete(dhcpTimer);
+        if (dnsTimer) cancelAndDelete(dnsTimer);
+        if (httpTimer) cancelAndDelete(httpTimer);
+
+        EV << "\n=== Client[" << getId() << "] Final Stats ===\n";
+        EV << "Mode: " << (mode == FULL_WORKFLOW ? "FULL_WORKFLOW" : "DHCP_ONLY") << "\n";
+        EV << "IP: " << assignedIP << "\n";
+        if (mode == FULL_WORKFLOW) {
+            EV << "Target: " << targetDomain << " → " << resolvedIP << "\n";
+            EV << "DNS queries: " << dnsQueries << " | HTTPS requests: " << httpRequests << "\n";
+        }
+        EV << "DHCP requests: " << dhcpRequests << "\n";
+    }
+};
+
+Define_Module(SecureClient);
+
+// ================================================================
+// Member function definitions
+// ================================================================
+void SecureClient::transitionToStage(WorkflowStage newStage) {
+    stage = newStage;
+    updateDisplay();
+}
+
+void SecureClient::scheduleDnsQuery(simtime_t delay) {
+    if (!dnsTimer) return;
+    if (dnsTimer->isScheduled())
+        cancelEvent(dnsTimer);
+    scheduleAt(simTime() + delay, dnsTimer);
+}
+
+void SecureClient::scheduleHttpRequest(simtime_t delay) {
+    if (!httpTimer) return;
+    if (httpTimer->isScheduled())
+        cancelEvent(httpTimer);
+    scheduleAt(simTime() + delay, httpTimer);
+}
+
+// ================================================================
+// Helper function definitions
+// ================================================================
+cPacket *encryptDhcpRequest(int clientId, const char *mac) {
+    cPacket *pkt = new cPacket("DHCP-DISCOVER");
+    pkt->addPar("encrypted") = true;
+    pkt->addPar("ttl") = 64;
+    pkt->addPar("protocol") = "DHCP";
+    pkt->addPar("clientId") = clientId;
+    pkt->addPar("macAddress") = mac;
+    return pkt;
+}
+
+cPacket *createEncryptedDnsQuery(int clientId, int queryId, const char *domain) {
+    cPacket *pkt = new cPacket("DNS-QUERY");
+    pkt->addPar("encrypted") = true;
+    pkt->addPar("ttl") = 64;
+    pkt->addPar("protocol") = "DNS";
+    pkt->addPar("clientId") = clientId;
+    pkt->addPar("queryId") = queryId;
+    pkt->addPar("domain") = domain;
+    pkt->setByteLength(256);
+    return pkt;
+}
+
+cPacket *createEncryptedHttpsRequest(int clientId, int requestId, const char *targetIP, const char *domain) {
+    cPacket *pkt = new cPacket("HTTPS-REQUEST");
+    pkt->addPar("encrypted") = true;
+    pkt->addPar("ttl") = 64;
+    pkt->addPar("protocol") = "HTTPS";
+    pkt->addPar("clientId") = clientId;
+    pkt->addPar("requestId") = requestId;
+    pkt->addPar("targetIP") = targetIP;
+    pkt->addPar("targetDomain") = domain;
+    pkt->setByteLength(1024);
+    return pkt;
+}
