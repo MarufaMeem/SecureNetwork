@@ -82,23 +82,6 @@ class SecureClient : public cSimpleModule {
     }
 
     virtual void handleMessage(cMessage *msg) override {
-       
-       
-       // --- Peer data trigger for client1_1 → client2_1 ---
-if (strcmp(msg->getName(), "peerData") == 0) {
-    EV << "CLIENT[" << getId() << "]: 💬 Sending encrypted data to Client2_1\n";
-    cPacket *p = new cPacket("CLIENT-DATA");
-    p->addPar("encrypted") = true;
-    p->addPar("protocol") = "DATA";
-    p->addPar("ttl") = 64;
-    p->addPar("clientId") = getId();
-    send(p, "port$o");
-    delete msg;
-    return;
-}
-
-       
-       
         if (msg == startupTimer) {
             EV << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             EV << "CLIENT[" << getId() << "]: JOINING NETWORK\n";
@@ -120,31 +103,29 @@ if (strcmp(msg->getName(), "peerData") == 0) {
             return;
         }
 
-if (msg == dhcpTimer) {
-    if (stage != DHCP_STAGE) return;
+        if (msg == dhcpTimer) {
+            if (stage != DHCP_STAGE) return;
 
-    if (dhcpRequests == 0) {
-        EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-DISCOVER\n";
-        cPacket *disc = new cPacket("DHCP-DISCOVER");
-        disc->addPar("encrypted") = true;
-        disc->addPar("protocol") = "DHCP";
-        disc->addPar("macAddress") = macAddress.c_str();
-        send(disc, "port$o");
-    } else {
-        EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-REQUEST\n";
-        cPacket *req = new cPacket("DHCP-REQUEST");
-        req->addPar("encrypted") = true;
-        req->addPar("protocol") = "DHCP";
-        req->addPar("macAddress") = macAddress.c_str();
-        send(req, "port$o");
-    }
+            if (dhcpRequests == 0) {
+                EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-DISCOVER\n";
+                cPacket *disc = new cPacket("DHCP-DISCOVER");
+                disc->addPar("encrypted") = true;
+                disc->addPar("protocol") = "DHCP";
+                disc->addPar("macAddress") = macAddress.c_str();
+                send(disc, "port$o");
+            } else {
+                EV_INFO << "CLIENT[" << getId() << "]: Sending DHCP-REQUEST\n";
+                cPacket *req = new cPacket("DHCP-REQUEST");
+                req->addPar("encrypted") = true;
+                req->addPar("protocol") = "DHCP";
+                req->addPar("macAddress") = macAddress.c_str();
+                send(req, "port$o");
+            }
 
-    dhcpRequests++;
-    scheduleAt(simTime() + 3.0, dhcpTimer);
-    return;
-}
-
-
+            dhcpRequests++;
+            scheduleAt(simTime() + 3.0, dhcpTimer);
+            return;
+        }
 
         if (msg == dnsTimer) {
             if (stage != DNS_STAGE || mode != FULL_WORKFLOW) return;
@@ -182,16 +163,23 @@ if (msg == dhcpTimer) {
             delete pkt;
             return;
         }
-if (msgName == "DHCP-OFFER") {
-    EV << "CLIENT[" << getId() << "]: Received DHCP-OFFER, sending DHCP-REQUEST\n";
-    cPacket *req = new cPacket("DHCP-REQUEST");
-    req->addPar("encrypted") = true;
-    req->addPar("protocol") = "DHCP";
-    req->addPar("macAddress") = macAddress.c_str();
-    send(req, "port$o");
-    delete pkt;
-    return;
-}
+        
+        if (msgName == "DHCP-OFFER") {
+            EV << "CLIENT[" << getId() << "]: Received DHCP-OFFER, sending DHCP-REQUEST\n";
+            cPacket *req = new cPacket("DHCP-REQUEST");
+            req->addPar("encrypted") = true;
+            req->addPar("protocol") = "DHCP";
+            req->addPar("macAddress") = macAddress.c_str();
+            
+            // Copy the offered IP to request
+            if (pkt->hasPar("offeredIP")) {
+                req->addPar("offeredIP") = pkt->par("offeredIP").stringValue();
+            }
+            
+            send(req, "port$o");
+            delete pkt;
+            return;
+        }
 
         // DHCP Response handling
         if (msgName == "DHCP-ACK" && protocol == "DHCP" && !hasIP) {
@@ -199,31 +187,12 @@ if (msgName == "DHCP-OFFER") {
                 assignedIP = pkt->par("assignedIP").stringValue();
                 hasIP = true;
 
-// === Trigger peer data from client1_1 to client2_1 ===
-if (getFullPath().find("client1_1") != std::string::npos) {
-    cMessage *peerTimer = new cMessage("peerData");
-    scheduleAt(simTime() + 0.5, peerTimer);
-}
-
-
                 EV << "\n╔══════════════════════════════════════╗\n";
                 EV << "║ CLIENT[" << getId() << "]: IP ASSIGNED: " << assignedIP << " ║\n";
                 EV << "╚══════════════════════════════════════╝\n\n";
                 
                 if (dhcpTimer && dhcpTimer->isScheduled())
                     cancelEvent(dhcpTimer);
-                
-// === NEW SECTION: test data from client1_1 → client2_1 ===
-if (getId() == 2) {  // Only client1_1 (check its module ID in simulation)
-    EV << "CLIENT[" << getId() << "]: 💬 Sending peer data to client2_1\n";
-    cPacket *peerPkt = new cPacket("CLIENT-DATA");
-    peerPkt->addPar("encrypted") = true;
-    peerPkt->addPar("protocol") = "DATA";
-    peerPkt->addPar("ttl") = 64;
-    peerPkt->addPar("clientId") = getId();
-    send(peerPkt, "port$o");
-}
-
 
                 if (mode == FULL_WORKFLOW) {
                     transitionToStage(DNS_STAGE);

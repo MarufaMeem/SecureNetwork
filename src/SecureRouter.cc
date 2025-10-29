@@ -236,45 +236,112 @@ void SecureRouter::handleMessage(cMessage *msg) {
 }
 
 // ================================================================
-// ROUTING LOGIC
+// ROUTING LOGIC - FIXED
 // ================================================================
-// =====================================================
-// Enhanced routing rules for SecureNetworkProject
-// =====================================================
-int SecureRouter::selectOutputGate(int arrivalGate, const std::string& protocol, cPacket *pkt)
-{
-    // --- 1️⃣ Client-to-client data forwarding ---
-    if (protocol == "DATA") {
-        if (routerId == 1) return 4;   // R1 → R2
-        if (routerId == 2) return 3;   // R2 → R3
-        if (routerId == 3) return 0;   // R3 → final subnet/server
+int SecureRouter::selectOutputGate(int arrivalGate, const std::string& protocol, cPacket *pkt) {
+    // Router 1: 0–2 clients, 3→Router3, 4→Router2
+    // Router 2: 0–2 clients, 3→Router3, 4→Router1
+    // Router 3: 0→Router1, 1→Router2, 2→DHCP, 3→DNS, 4→httpServer1, 5→httpServer2
+
+    // ---------- ROUTER 1 ----------
+    if (routerId == 1) {
+        if (arrivalGate <= 2) return 3; // client→R3
+        if (arrivalGate == 3) { // R3→clients
+            if (protocol == "DHCP" && pkt->hasPar("macAddress")) {
+                std::string mac = pkt->par("macAddress").stringValue();
+                if (dhcpLearnTable.count(mac)) return dhcpLearnTable[mac];
+            }
+            if ((protocol == "DNS" || protocol == "HTTPS") && pkt->hasPar("clientId")) {
+                int cid = pkt->par("clientId");
+                if (clientPortTable.count(cid)) return clientPortTable[cid];
+                if (dnsQueryTable.count(cid))  return dnsQueryTable[cid];
+            }
+            return 0;
+        }
+        if (arrivalGate == 4) return 3; // R2→R3
     }
 
-    // --- 2️⃣ DHCP and DNS always route toward server (R3) ---
-    if (protocol == "DHCP" || protocol == "DNS") {
-        if (routerId == 1) return 3;
-        if (routerId == 2) return 3;
-        if (routerId == 3) return 2;
+    // ---------- ROUTER 2 ----------
+    else if (routerId == 2) {
+        if (arrivalGate <= 2) return 3; // client→R3
+        if (arrivalGate == 3) { // R3→clients
+            if (protocol == "DHCP" && pkt->hasPar("macAddress")) {
+                std::string mac = pkt->par("macAddress").stringValue();
+                if (dhcpLearnTable.count(mac)) return dhcpLearnTable[mac];
+            }
+            if ((protocol == "DNS" || protocol == "HTTPS") && pkt->hasPar("clientId")) {
+                int cid = pkt->par("clientId");
+                if (clientPortTable.count(cid)) return clientPortTable[cid];
+                if (dnsQueryTable.count(cid))  return dnsQueryTable[cid];
+            }
+            return 0;
+        }
+        if (arrivalGate == 4) return 3; // R1→R3
     }
 
-    // --- 3️⃣ HTTPS routing toward servers ---
-    if (protocol == "HTTPS") {
-        if (routerId == 1) return 4;   // R1 → R2
-        if (routerId == 2) return 3;   // R2 → R3
-        if (routerId == 3) return 2;   // R3 → servers
+    // ---------- ROUTER 3 - FIXED ----------
+    else if (routerId == 3) {
+        // FIXED: Updated constants to match actual topology
+        const int dhcpPort = 2;
+        const int dnsPort = 3;           // Only 1 DNS server
+        const int httpServer1Port = 4;   // cisco.com
+        const int httpServer2Port = 5;   // omnet.com
+
+        // from routers → servers
+        if (arrivalGate <= 1) {
+            if (protocol == "DHCP") return dhcpPort;
+            
+            if (protocol == "DNS") {
+                // All DNS queries go to the single DNS server at port 3
+                return dnsPort;
+            }
+            
+            if (protocol == "HTTPS") {
+                // FIXED: Route HTTPS based on target IP
+                std::string targetIP = pkt->hasPar("targetIP") ? pkt->par("targetIP").stringValue() : "";
+                
+                if (targetIP == "192.168.1.100") {
+                    // cisco.com → httpServer1 (port 4)
+                    return httpServer1Port;
+                } else if (targetIP == "192.168.1.101") {
+                    // omnet.com → httpServer2 (port 5)
+                    return httpServer2Port;
+                } else {
+                    // Default to httpServer1
+                    EV_WARN << "R3: Unknown target IP " << targetIP << ", routing to httpServer1\n";
+                    return httpServer1Port;
+                }
+            }
+            
+            // Unknown protocol from router - default to httpServer1
+            return httpServer1Port;
+        }
+
+        // from servers → routers (RETURN ROUTING)
+        if (arrivalGate >= dhcpPort && arrivalGate <= httpServer2Port) {
+            // Use sourceRouter tag to route back correctly
+            if (pkt->hasPar("sourceRouter")) {
+                int src = (int)pkt->par("sourceRouter").longValue();
+                EV_DEBUG << "R3: Return routing - sourceRouter=" << src << " protocol=" << protocol << "\n";
+                if (src == 1) return 0;  // back to R1
+                if (src == 2) return 1;  // back to R2
+            }
+
+            // Fallback: use clientId grouping (clients 2-4 on R1, 5-6 on R2)
+            if (pkt->hasPar("clientId")) {
+                int cid = pkt->par("clientId");
+                EV_DEBUG << "R3: Using clientId fallback - cid=" << cid << "\n";
+                if (cid >= 5) return 1; // router2 side clients (5, 6)
+                else return 0;          // router1 side clients (2, 3, 4)
+            }
+            
+            // Last resort: default to R1
+            EV_WARN << "R3: No routing info, defaulting to port 0\n";
+            return 0;
+        }
     }
 
-    // --- 4️⃣ Default OSPF or unknown protocol handling ---
-    if (protocol == "OSPF")
-        return (routerId % 3); // cycle connections for demonstration
-
-    // --- Fallback: broadcast to all except arrivalGate ---
-    for (int i = 0; i < gateSize("port$o"); i++) {
-        if (i != arrivalGate)
-            return i;
-    }
-
-    return -1; // drop if no valid gate found
+    return -1;
 }
 
 // ================================================================

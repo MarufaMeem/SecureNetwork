@@ -1,8 +1,8 @@
 version 3
-run General-0-20251029-22:00:07-47408
+run General-0-20251029-22:29:22-34676
 attr configname General
-attr datetime 20251029-22:00:07
-attr datetimef 20251029-220007
+attr datetime 20251029-22:29:22
+attr datetimef 20251029-222922
 attr experiment General
 attr inifile omnetpp.ini
 attr iterationvars ""
@@ -10,7 +10,7 @@ attr iterationvarsd ""
 attr iterationvarsf ""
 attr measurement ""
 attr network simulations.SecureNetworkProject
-attr processid 47408
+attr processid 34676
 attr repetition 0
 attr replication #0
 attr resultdir results
@@ -431,7 +431,7 @@ par SecureNetworkProject.client2_2 targetDomain "\"\""
 par SecureNetworkProject.attacker typename "\"simulations.AttackerNode\""
 par SecureNetworkProject.attacker attackInterval 8s
 attr unit s
-scalar SecureNetworkProject.attacker AttacksAttempted 1
+scalar SecureNetworkProject.attacker AttacksAttempted 12
 par SecureNetworkProject.router1 typename "\"simulations.SecureRouter\""
 par SecureNetworkProject.router1 blockUnencrypted true
 par SecureNetworkProject.router1 ttlCheck true
@@ -441,7 +441,7 @@ par SecureNetworkProject.router1 routerId 1
 par SecureNetworkProject.router1 ipAddress "\"10.0.0.1\""
 par SecureNetworkProject.router1 ospfUpdateInterval 10s
 attr unit s
-scalar SecureNetworkProject.router1 Router1_Forwarded 15
+scalar SecureNetworkProject.router1 Router1_Forwarded 16
 par SecureNetworkProject.router2 typename "\"simulations.SecureRouter\""
 par SecureNetworkProject.router2 blockUnencrypted true
 par SecureNetworkProject.router2 ttlCheck true
@@ -451,7 +451,7 @@ par SecureNetworkProject.router2 routerId 2
 par SecureNetworkProject.router2 ipAddress "\"10.0.0.2\""
 par SecureNetworkProject.router2 ospfUpdateInterval 10s
 attr unit s
-scalar SecureNetworkProject.router2 Router2_Forwarded 10
+scalar SecureNetworkProject.router2 Router2_Forwarded 15
 par SecureNetworkProject.router3 typename "\"simulations.SecureRouter\""
 par SecureNetworkProject.router3 blockUnencrypted true
 par SecureNetworkProject.router3 ttlCheck true
@@ -461,26 +461,26 @@ par SecureNetworkProject.router3 routerId 3
 par SecureNetworkProject.router3 ipAddress "\"10.0.0.3\""
 par SecureNetworkProject.router3 ospfUpdateInterval 10s
 attr unit s
-scalar SecureNetworkProject.router3 Router3_Forwarded 20
+scalar SecureNetworkProject.router3 Router3_Forwarded 31
 par SecureNetworkProject.dhcpServer typename "\"simulations.SecureDHCPServer\""
 par SecureNetworkProject.dhcpServer ipAddress "\"192.168.1.10\""
-scalar SecureNetworkProject.dhcpServer RequestsReceived 9
+scalar SecureNetworkProject.dhcpServer RequestsReceived 10
 scalar SecureNetworkProject.dhcpServer LeasesGranted 0
 scalar SecureNetworkProject.dhcpServer AuthFailures 0
 par SecureNetworkProject.dnsServer typename "\"simulations.SecureDNSServer\""
 par SecureNetworkProject.dnsServer ipAddress "\"192.168.1.11\""
-scalar SecureNetworkProject.dnsServer QueriesReceived 1
+scalar SecureNetworkProject.dnsServer QueriesReceived 2
 scalar SecureNetworkProject.dnsServer QueriesBlocked 0
 scalar SecureNetworkProject.dnsServer SpoofingAttempts 0
 par SecureNetworkProject.httpServer1 typename "\"simulations.SecureHTTPServer\""
 par SecureNetworkProject.httpServer1 ipAddress "\"192.168.1.100\""
 par SecureNetworkProject.httpServer1 serverName "\"cisco.com\""
-scalar SecureNetworkProject.httpServer1 HTTPS_Accepted_cisco.com 0
-scalar SecureNetworkProject.httpServer1 HTTPS_Rejected_cisco.com 0
+scalar SecureNetworkProject.httpServer1 HTTPS_Accepted_cisco.com 1
+scalar SecureNetworkProject.httpServer1 HTTPS_Rejected_cisco.com 2
 par SecureNetworkProject.httpServer2 typename "\"simulations.SecureHTTPServer\""
 par SecureNetworkProject.httpServer2 ipAddress "\"192.168.1.101\""
 par SecureNetworkProject.httpServer2 serverName "\"omnet.com\""
-scalar SecureNetworkProject.httpServer2 HTTPS_Accepted_omnet.com 0
-scalar SecureNetworkProject.httpServer2 HTTPS_Rejected_omnet.com 1
+scalar SecureNetworkProject.httpServer2 HTTPS_Accepted_omnet.com 1
+scalar SecureNetworkProject.httpServer2 HTTPS_Rejected_omnet.com 0
 par SecureNetworkProject typename "\"simulations.SecureNetworkProject\""
 
