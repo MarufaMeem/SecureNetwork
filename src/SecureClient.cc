@@ -21,7 +21,8 @@ class SecureClient : public cSimpleModule {
         DHCP_STAGE,
         DNS_STAGE,
         HTTPS_STAGE,
-        COMPLETED_STAGE
+        COMPLETED_STAGE,
+        P2P_STAGE
     };
 
     enum ClientMode {
@@ -33,10 +34,13 @@ class SecureClient : public cSimpleModule {
     cMessage *dnsTimer = nullptr;
     cMessage *httpTimer = nullptr;
     cMessage *startupTimer = nullptr;
+    cMessage *p2pTimer = nullptr;
 
     int dhcpRequests = 0;
     int dnsQueries = 0;
     int httpRequests = 0;
+    int p2pMessagesSent = 0;
+    int p2pMessagesReceived = 0;
     std::string assignedIP = "DHCP...";
     bool hasIP = false;
     double startTime = 0;
@@ -44,12 +48,14 @@ class SecureClient : public cSimpleModule {
     std::string targetDomain;
     std::string resolvedIP;
     ClientMode mode;
+    std::string clientName;  // Store the logical client name
 
     WorkflowStage stage = WAITING;
 
     void transitionToStage(WorkflowStage newStage);
     void scheduleDnsQuery(simtime_t delay);
     void scheduleHttpRequest(simtime_t delay);
+   
 
   protected:
     virtual void initialize() override {
@@ -57,6 +63,22 @@ class SecureClient : public cSimpleModule {
         startTime = par("startTime").doubleValue() + workflowLead;
         macAddress = par("macAddress").stringValue();
         targetDomain = par("targetDomain").stringValue();
+        
+        // Extract logical client name from module name (e.g., "client1_1" -> "Client 1-1")
+        std::string moduleName = getName();
+        if (moduleName.find("client") == 0) {
+            // Parse "client1_1" format
+            size_t underscore = moduleName.find('_');
+            if (underscore != std::string::npos) {
+                std::string part1 = moduleName.substr(6, underscore - 6);  // Skip "client"
+                std::string part2 = moduleName.substr(underscore + 1);
+                clientName = "Client " + part1 + "-" + part2;
+            } else {
+                clientName = "Client";
+            }
+        } else {
+            clientName = moduleName;
+        }
         
         // Determine client mode
         std::string modeStr = par("clientMode").stringValue();
@@ -72,9 +94,9 @@ class SecureClient : public cSimpleModule {
         updateDisplay();
 
         if (mode == FULL_WORKFLOW) {
-            EV << "✅ CLIENT[" << getId() << "]: FULL_WORKFLOW mode - Target: " << targetDomain << "\n";
+            EV << "✅ " << clientName << " [ID=" << getId() << "]: FULL_WORKFLOW mode - Target: " << targetDomain << "\n";
         } else {
-            EV << "✅ CLIENT[" << getId() << "]: DHCP_ONLY mode\n";
+            EV << "✅ " << clientName << " [ID=" << getId() << "]: DHCP_ONLY mode\n";
         }
         
         if (startTime > 0)
@@ -84,7 +106,7 @@ class SecureClient : public cSimpleModule {
     virtual void handleMessage(cMessage *msg) override {
         if (msg == startupTimer) {
             EV << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-            EV << "CLIENT[" << getId() << "]: JOINING NETWORK\n";
+            EV << clientName << " [ID=" << getId() << "]: JOINING NETWORK\n";
             if (mode == FULL_WORKFLOW) {
                 EV << "   Mode: FULL_WORKFLOW (DNS + HTTP)\n";
                 EV << "   Target: " << targetDomain << "\n";
@@ -97,6 +119,7 @@ class SecureClient : public cSimpleModule {
             if (!dhcpTimer) dhcpTimer = new cMessage("dhcpTimer");
             if (!dnsTimer)   dnsTimer  = new cMessage("dnsTimer");
             if (!httpTimer)  httpTimer = new cMessage("httpTimer");
+            if (!p2pTimer)   p2pTimer  = new cMessage("p2pTimer");
 
             transitionToStage(DHCP_STAGE);
             scheduleAt(simTime() + uniform(0.1, 0.5), dhcpTimer);
@@ -152,6 +175,16 @@ class SecureClient : public cSimpleModule {
             return;
         }
 
+        // P2P Timer - for client1_1 to send message to client2_1
+        if (msg == p2pTimer) {
+            if (getId() == 2) {  // client1_1
+                // Send P2P message to client2_1 (clientId=5)
+                sendP2PMessage(5, "Hello from client1_1!");
+                EV << "CLIENT[" << getId() << "]: 💬 Sent P2P message to CLIENT[5]\n";
+            }
+            return;
+        }
+
         // Handle received packets
         cPacket *pkt = check_and_cast<cPacket*>(msg);
         std::string msgName = pkt->getName();
@@ -160,6 +193,27 @@ class SecureClient : public cSimpleModule {
         // Ignore OSPF updates
         if (msgName.find("OSPF") != std::string::npos || protocol == "OSPF") {
             EV_DEBUG << "CLIENT[" << getId() << "]: Ignoring OSPF routing message\n";
+            delete pkt;
+            return;
+        }
+        
+        // Handle P2P messages
+        if (protocol == "P2P") {
+            p2pMessagesReceived++;
+            int srcClientId = pkt->hasPar("srcClientId") ? (int)pkt->par("srcClientId").longValue() : -1;
+            std::string message = pkt->hasPar("message") ? pkt->par("message").stringValue() : "";
+            
+            EV << "\n╔══════════════════════════════════════╗\n";
+            EV << "║ CLIENT[" << getId() << "]: P2P MESSAGE RECEIVED ║\n";
+            EV << "║ From: CLIENT[" << srcClientId << "]                    ║\n";
+            EV << "║ Message: " << message.substr(0, 20) << "║\n";
+            EV << "╚══════════════════════════════════════╝\n\n";
+            
+            // Send acknowledgment back
+            if (getId() == 5) {  // client2_1 replies to client1_1
+                scheduleAt(simTime() + 0.5, p2pTimer);
+            }
+            
             delete pkt;
             return;
         }
@@ -231,6 +285,13 @@ class SecureClient : public cSimpleModule {
                 EV << "╚══════════════════════════════════════╝\n\n";
                 
                 transitionToStage(COMPLETED_STAGE);
+                
+                // ✅ NEW: Start P2P communication after HTTP completes
+                // Client1_1 waits a bit longer to ensure client2_1 is also done
+                if (getId() == 2) {  // client1_1
+                    EV << "CLIENT[" << getId() << "]: ⏳ Waiting for peer to complete...\n";
+                    scheduleAt(simTime() + 3.5, p2pTimer);  // Wait ~3.5s for client2_1 to finish
+                }
             }
         }
         else {
@@ -240,6 +301,21 @@ class SecureClient : public cSimpleModule {
 
         updateDisplay();
         delete pkt;
+    }
+
+    void sendP2PMessage(int destClientId, const std::string& message) {
+        p2pMessagesSent++;
+        
+        cPacket *pkt = new cPacket("P2P-MESSAGE");
+        pkt->addPar("protocol") = "P2P";
+        pkt->addPar("encrypted") = true;
+        pkt->addPar("ttl") = 64;
+        pkt->addPar("srcClientId") = getId();
+        pkt->addPar("destClientId") = destClientId;
+        pkt->addPar("message") = message.c_str();
+        pkt->setByteLength(512);
+        
+        send(pkt, "port$o");
     }
 
     void updateDisplay() {
@@ -265,9 +341,17 @@ class SecureClient : public cSimpleModule {
                 stageLabel = "HTTPS (" + targetDomain + ")";
                 color = "orange";
                 break;
+            case P2P_STAGE:
+                stageLabel = "P2P Communication";
+                color = "blue";
+                break;
             case COMPLETED_STAGE:
                 if (mode == FULL_WORKFLOW) {
-                    stageLabel = "✓ Complete";
+                    if (p2pMessagesSent > 0 || p2pMessagesReceived > 0) {
+                        stageLabel = "✓ Complete + P2P";
+                    } else {
+                        stageLabel = "✓ Complete";
+                    }
                     color = "green";
                 } else {
                     stageLabel = "✓ DHCP Only";
@@ -278,12 +362,12 @@ class SecureClient : public cSimpleModule {
 
         char buf[200];
         if (hasIP && mode == FULL_WORKFLOW) {
-            sprintf(buf, "Client %d\n%s\nIP: %s\n→ %s", getId(), stageLabel.c_str(), 
+            sprintf(buf, "%s\n%s\nIP: %s\n→ %s", clientName.c_str(), stageLabel.c_str(), 
                     assignedIP.c_str(), targetDomain.c_str());
         } else if (hasIP) {
-            sprintf(buf, "Client %d\n%s\nIP: %s", getId(), stageLabel.c_str(), assignedIP.c_str());
+            sprintf(buf, "%s\n%s\nIP: %s", clientName.c_str(), stageLabel.c_str(), assignedIP.c_str());
         } else {
-            sprintf(buf, "Client %d\n%s", getId(), stageLabel.c_str());
+            sprintf(buf, "%s\n%s", clientName.c_str(), stageLabel.c_str());
         }
 
         getDisplayString().setTagArg("t", 0, buf);
@@ -295,15 +379,20 @@ class SecureClient : public cSimpleModule {
         if (dhcpTimer) cancelAndDelete(dhcpTimer);
         if (dnsTimer) cancelAndDelete(dnsTimer);
         if (httpTimer) cancelAndDelete(httpTimer);
+        if (p2pTimer) cancelAndDelete(p2pTimer);
 
-        EV << "\n=== Client[" << getId() << "] Final Stats ===\n";
+        EV << "\n=== " << clientName << " [ID=" << getId() << "] Final Stats ===\n";
         EV << "Mode: " << (mode == FULL_WORKFLOW ? "FULL_WORKFLOW" : "DHCP_ONLY") << "\n";
         EV << "IP: " << assignedIP << "\n";
         if (mode == FULL_WORKFLOW) {
             EV << "Target: " << targetDomain << " → " << resolvedIP << "\n";
             EV << "DNS queries: " << dnsQueries << " | HTTPS requests: " << httpRequests << "\n";
+            EV << "P2P messages sent: " << p2pMessagesSent << " | received: " << p2pMessagesReceived << "\n";
         }
         EV << "DHCP requests: " << dhcpRequests << "\n";
+        
+        recordScalar("P2P_MessagesSent", p2pMessagesSent);
+        recordScalar("P2P_MessagesReceived", p2pMessagesReceived);
     }
 };
 

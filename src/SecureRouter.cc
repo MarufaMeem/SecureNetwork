@@ -166,7 +166,7 @@ void SecureRouter::handleMessage(cMessage *msg) {
     }
 
     // IDS check
-    if (idsEnabled && protocol != "HTTPS" && protocol != "DHCP" && protocol != "DNS") {
+    if (idsEnabled && protocol != "HTTPS" && protocol != "DHCP" && protocol != "DNS" && protocol != "P2P") {
         EV << "⚠️ R" << routerId << " IDS: Suspicious protocol " << protocol << "\n";
         logFile << simTime() << ",SUSPICIOUS," << protocol << "\n";
     }
@@ -185,8 +185,23 @@ void SecureRouter::handleMessage(cMessage *msg) {
         }
     }
 
-    // Learn client ports for DNS/HTTPS
-    if ((protocol == "DNS" || protocol == "HTTPS") && pkt->hasPar("clientId")) {
+    // Learn client ports for DNS/HTTPS/P2P
+    if ((protocol == "DNS" || protocol == "HTTPS" || protocol == "P2P") && pkt->hasPar("srcClientId")) {
+        std::string pktName = pkt->getName();
+        bool isRequest = pktName.find("REQUEST") != std::string::npos || 
+                        pktName.find("QUERY") != std::string::npos ||
+                        pktName.find("MESSAGE") != std::string::npos;
+        // Only learn from client ports (0-2 for R1 and R2)
+        if (isRequest && !isRouterPort(arrivalGate)) {
+            int cid = (int)pkt->par("srcClientId").longValue();
+            clientPortTable[cid] = arrivalGate;
+            if (protocol == "DNS") dnsQueryTable[cid] = arrivalGate;
+            EV << "📗 R" << routerId << ": learned clientId " << cid
+               << " on port " << arrivalGate << " (" << protocol << ")\n";
+        }
+    }
+    // Fallback: also learn from clientId parameter (for backward compatibility)
+    else if ((protocol == "DNS" || protocol == "HTTPS") && pkt->hasPar("clientId")) {
         std::string pktName = pkt->getName();
         bool isRequest = pktName.find("REQUEST") != std::string::npos || pktName.find("QUERY") != std::string::npos;
         // Only learn from client ports (0-2 for R1 and R2)
@@ -245,6 +260,52 @@ int SecureRouter::selectOutputGate(int arrivalGate, const std::string& protocol,
 
     // ---------- ROUTER 1 ----------
     if (routerId == 1) {
+        // Handle P2P messages - OPTIMIZED for direct R1→R2 path
+        if (protocol == "P2P") {
+            if (arrivalGate <= 2) {
+                // From client → check destination and use shortest path
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    
+                    // Router1 clients (2, 3, 4) - route locally
+                    if (destId >= 2 && destId <= 4) {
+                        if (clientPortTable.count(destId)) {
+                            EV_DEBUG << "R1: P2P local routing to client " << destId << "\n";
+                            return clientPortTable[destId];
+                        }
+                        return 0;  // fallback
+                    }
+                    
+                    // Router2 clients (5, 6) - DIRECT to Router2 (port 4)
+                    if (destId >= 5 && destId <= 6) {
+                        EV_DEBUG << "R1: P2P DIRECT to R2 via port 4 (client " << destId << ")\n";
+                        return 4;  // ✅ Direct R1→R2 link
+                    }
+                }
+                // Unknown destination - send to R3 as fallback
+                return 3;
+            } else if (arrivalGate == 3) {
+                // From Router3 → route to local clients
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    if (clientPortTable.count(destId)) {
+                        return clientPortTable[destId];
+                    }
+                }
+                return 0;
+            } else if (arrivalGate == 4) {
+                // From Router2 → route to local clients
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    if (clientPortTable.count(destId)) {
+                        EV_DEBUG << "R1: P2P from R2 to local client " << destId << "\n";
+                        return clientPortTable[destId];
+                    }
+                }
+                return 0;
+            }
+        }
+        
         if (arrivalGate <= 2) return 3; // client→R3
         if (arrivalGate == 3) { // R3→clients
             if (protocol == "DHCP" && pkt->hasPar("macAddress")) {
@@ -263,6 +324,52 @@ int SecureRouter::selectOutputGate(int arrivalGate, const std::string& protocol,
 
     // ---------- ROUTER 2 ----------
     else if (routerId == 2) {
+        // Handle P2P messages - OPTIMIZED for direct R2→R1 path
+        if (protocol == "P2P") {
+            if (arrivalGate <= 2) {
+                // From client → check destination and use shortest path
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    
+                    // Router2 clients (5, 6) - route locally
+                    if (destId >= 5 && destId <= 6) {
+                        if (clientPortTable.count(destId)) {
+                            EV_DEBUG << "R2: P2P local routing to client " << destId << "\n";
+                            return clientPortTable[destId];
+                        }
+                        return 0;  // fallback
+                    }
+                    
+                    // Router1 clients (2, 3, 4) - DIRECT to Router1 (port 4)
+                    if (destId >= 2 && destId <= 4) {
+                        EV_DEBUG << "R2: P2P DIRECT to R1 via port 4 (client " << destId << ")\n";
+                        return 4;  // ✅ Direct R2→R1 link
+                    }
+                }
+                // Unknown destination - send to R3 as fallback
+                return 3;
+            } else if (arrivalGate == 3) {
+                // From Router3 → route to local clients
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    if (clientPortTable.count(destId)) {
+                        return clientPortTable[destId];
+                    }
+                }
+                return 0;
+            } else if (arrivalGate == 4) {
+                // From Router1 → route to local clients
+                if (pkt->hasPar("destClientId")) {
+                    int destId = (int)pkt->par("destClientId").longValue();
+                    if (clientPortTable.count(destId)) {
+                        EV_DEBUG << "R2: P2P from R1 to local client " << destId << "\n";
+                        return clientPortTable[destId];
+                    }
+                }
+                return 0;
+            }
+        }
+        
         if (arrivalGate <= 2) return 3; // client→R3
         if (arrivalGate == 3) { // R3→clients
             if (protocol == "DHCP" && pkt->hasPar("macAddress")) {
@@ -289,6 +396,8 @@ int SecureRouter::selectOutputGate(int arrivalGate, const std::string& protocol,
 
         // from routers → servers
         if (arrivalGate <= 1) {
+            // Note: P2P messages now use direct R1↔R2 link, so R3 won't see them
+            
             if (protocol == "DHCP") return dhcpPort;
             
             if (protocol == "DNS") {
